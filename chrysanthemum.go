@@ -3,9 +3,12 @@ package chrysanthemum
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"io"
+	"github.com/mattn/go-isatty"
+	"os"
 	"time"
 )
+
+var isTerminal = isatty.IsTerminal(os.Stdout.Fd())
 
 var Frames = []string{
 	color.MagentaString("⠋"),
@@ -23,22 +26,28 @@ var Success = color.GreenString("✓")
 var Fail = color.RedString("✗")
 
 type Chrysanthemum struct {
-	writer  io.Writer
 	stop    chan bool
 	stopped bool
 }
 
-func New(writer io.Writer, text string) *Chrysanthemum {
-	fmt.Fprint(writer, "   "+text)
+func New(text string) *Chrysanthemum {
+	if !isTerminal {
+		fmt.Print(text)
+	} else {
+		fmt.Print("   " + text)
+	}
 	return &Chrysanthemum{
-		writer:  writer,
 		stop:    make(chan bool),
 		stopped: false,
 	}
 }
 
 func (c *Chrysanthemum) Start() *Chrysanthemum {
-	fmt.Fprint(c.writer, "\033[?25l") // hide cursor
+	if !isTerminal {
+		return c
+	}
+
+	fmt.Print("\033[?25l") // hide cursor
 
 	i := 0
 	go func() {
@@ -52,7 +61,7 @@ func (c *Chrysanthemum) Start() *Chrysanthemum {
 			if i == len(Frames) {
 				i = 0
 			}
-			fmt.Fprintf(c.writer, "\r %s ", Frames[i])
+			fmt.Printf("\r %s ", Frames[i])
 			i++
 		}
 	}()
@@ -61,13 +70,18 @@ func (c *Chrysanthemum) Start() *Chrysanthemum {
 }
 
 func (c *Chrysanthemum) end(flag string) {
+	if !isTerminal {
+		fmt.Println()
+		return
+	}
+
 	if c.stopped {
 		return
 	}
 	c.stop <- true
 	c.stopped = true
-	fmt.Fprintf(c.writer, "\033[?25h") // show cursor
-	fmt.Fprintf(c.writer, "\r %s \n", flag)
+	fmt.Printf("\033[?25h") // show cursor
+	fmt.Printf("\r %s \n", flag)
 }
 
 func (c *Chrysanthemum) Successed() {
