@@ -2,10 +2,12 @@ package chrysanthemum
 
 import (
 	"fmt"
+	"os"
+	"runtime"
+	"time"
+
 	"github.com/fatih/color"
 	"github.com/mattn/go-isatty"
-	"os"
-	"time"
 )
 
 var isTerminal = isatty.IsTerminal(os.Stdout.Fd())
@@ -27,20 +29,31 @@ type Chrysanthemum struct {
 }
 
 func init() {
-	Frames = []string{
-		color.MagentaString("⠋"),
-		color.MagentaString("⠙"),
-		color.MagentaString("⠹"),
-		color.MagentaString("⠸"),
-		color.MagentaString("⠼"),
-		color.MagentaString("⠴"),
-		color.MagentaString("⠦"),
-		color.MagentaString("⠧"),
-		color.MagentaString("⠇"),
-		color.MagentaString("⠏"),
+	if runtime.GOOS == "windows" {
+		Frames = []string{
+			"-",
+			"\\",
+			"|",
+			"/",
+		}
+		Success = " "
+		Fail = color.RedString("x")
+	} else {
+		Frames = []string{
+			color.MagentaString("⠋"),
+			color.MagentaString("⠙"),
+			color.MagentaString("⠹"),
+			color.MagentaString("⠸"),
+			color.MagentaString("⠼"),
+			color.MagentaString("⠴"),
+			color.MagentaString("⠦"),
+			color.MagentaString("⠧"),
+			color.MagentaString("⠇"),
+			color.MagentaString("⠏"),
+		}
+		Success = color.GreenString("✓")
+		Fail = color.RedString("✗")
 	}
-	Success = color.GreenString("✓")
-	Fail = color.RedString("✗")
 }
 
 // New create a spinner instance
