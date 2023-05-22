@@ -2,7 +2,7 @@ module github.com/aisk/chrysanthemum
 
 require (
 	github.com/fatih/color v1.15.0
-	github.com/mattn/go-isatty v0.0.18
+	github.com/mattn/go-isatty v0.0.19
 )
 
 require (
