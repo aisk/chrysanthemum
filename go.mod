@@ -4,7 +4,7 @@ go 1.26.1
 
 require (
 	github.com/fatih/color v1.18.0
-	github.com/mattn/go-isatty v0.0.22
+	github.com/mattn/go-isatty v0.0.24
 )
 
 require (
